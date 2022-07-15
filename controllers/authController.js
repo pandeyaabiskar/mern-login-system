@@ -1,25 +1,33 @@
-const User = require('../models/User')
+const User = require("../models/User");
 
 const returnSignupPage = (req, res) => {
-    //Code
-}
+  res.render("signup");
+};
 
 const returnLoginPage = (req, res) => {
-    //Code
-}
+  res.render("login");
+};
 
-const createUser = (req, res) => {
-    //Code
-
-}
+const createUser = async (req, res) => {
+  //Code
+  try {
+    const user = new User(req.body);
+    console.log(user)
+    await user.save();
+    res.json({ userid: user._id });
+  } catch (err) {
+    console.log(err);
+    res.json(err);
+  }
+};
 
 const loginUser = (req, res) => {
-    //Code
-}
+  //Code
+};
 
 module.exports = {
-    returnSignupPage,
-    returnLoginPage,
-    createUser,
-    loginUser
-}
+  returnSignupPage,
+  returnLoginPage,
+  createUser,
+  loginUser,
+};
