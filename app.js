@@ -2,9 +2,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth");
 const app = express();
-const { requireAuth } = require("./middleware/authMiddleware");
+const { requireAuth, checkUser } = require("./middleware/authMiddleware");
 const cookieParser = require("cookie-parser");
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 
 // middleware
 app.use(express.static("public"));
@@ -26,6 +26,8 @@ mongoose
   .then((result) => app.listen(3000))
   .catch((err) => console.log(err));
 
+//Middleware to check the info of the user who is logged in
+app.get('*', checkUser)
 // routes
 app.get("/", (req, res) => {
   res.render('home');

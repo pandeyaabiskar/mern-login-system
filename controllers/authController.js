@@ -2,6 +2,32 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
+const handleErrors = (err) => {
+  console.log(err._message);
+  const errors = {email: '', password: ''}
+
+  if(err.message === 'incorrect email'){
+    errors.email = "Email is incorrect"
+  }
+
+  if(err.message === 'incorrect password'){
+    errors.password = "Password is incorrect"
+  }
+
+  if(err.code === 11000){
+    errors.email = "Email already exists"
+    return errors;
+  }
+
+  if(err._message === 'User validation failed'){
+    Object.values(err.errors).map(({properties}) => {
+      errors[properties.path] = properties.message
+    })
+  }
+  console.log(errors)
+  return errors;
+}
+
 const returnSignupPage = (req, res) => {
   res.render("signup");
 };
@@ -23,8 +49,8 @@ const createUser = async (req, res) => {
     res.cookie("jwt", token);
     res.json({ user: user._id });
   } catch (err) {
-    console.log(err);
-    res.json(err);
+    const errors = handleErrors(err);
+    res.json({errors});
   }
 };
 
@@ -42,11 +68,15 @@ const loginUser = async (req, res) => {
         res.cookie("jwt", token);
         res.json({ user: user._id });
         return;
+      }else{
+        throw new Error('incorrect password')
       }
+    }else{
+      throw new Error('incorrect email')
     }
-    res.json({ msg: "Cannot authenticate" });
   } catch (err) {
-    res.json(err);
+    const errors = handleErrors(err);
+    res.json({errors});
   }
 };
 
